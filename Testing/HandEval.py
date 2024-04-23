@@ -2,24 +2,34 @@ import poker
 import tkinter
 from tkinter import ttk
 from tkinter import messagebox
-import PIL
 from PIL import Image
 from PIL import ImageTk
+from treys import Evaluator
 import random
 
 deck = list(poker.Card)
 cards = []
+board = []
 image_list = []
-count = 0
+handCount = 0
+boardCount = 0
 
 #Getting the necessary card
 
-def changeCard():
+def changeCardHand():
     global cards
     random.shuffle(deck)
     card = deck.pop()
     if len(cards) <2:
         cards.append(card)
+    return card
+
+def changeCardBoard():
+    global board 
+    random.shuffle(deck)
+    card = deck.pop()
+    if len(board) < 5:
+        board.append(card)
     return card
 
 
@@ -52,21 +62,33 @@ def showCard(suit, rank, width, height):
     return image
 
 
-#need to tune the spacing a bit
+#need to tune the spacing a bit + as well as allow for multiple lists to find hand evaluations
+#need to differentiate the amount 
 def dealCard():
-    global count, cards, cardSuit, cardRank 
-    if count < 2:
-        card = cards[count]
+    global handCount, cards, cardSuit, cardRank 
+    if handCount < 2:
+        card = cards[handCount]
         cardSuit = str(card.suit)
         cardRank = str(card.rank)
         cardImage = showCard(cardSuit, cardRank, width= 75, height = 100)
         image_list.append(cardImage)
-        canvas.create_image(100 + count*100, 200, image = cardImage)
-        count = count + 1
+        canvas.create_image(200 + handCount*160, 400, image = cardImage)
+        handCount = handCount + 1
     else:
         message = messagebox.showerror("showerror", "You already have two cards")
 
-        
+def setBoard():
+    global boardCount, cards, cardSuit, cardRank
+    if boardCount < 5:
+        card = board[boardCount]
+        cardSuit = str(card.suit)
+        cardRank = str(card.rank)
+        cardImage = showCard(cardSuit, cardRank, width= 75, height = 100)
+        image_list.append(cardImage)
+        canvas.create_image(200 + boardCount*80, 300, width = 75, hight = 100)
+        boardCount = boardCount + 1
+    else:
+        message = messagebox.showerror("showerror", "The board is already full")
 
 
 
@@ -77,8 +99,11 @@ root.geometry("800x1000")
 deckOfCardImage = Image.open(f"PNG-cards-1.3/card_back_red.png")
 deckOfCardImage = deckOfCardImage.resize((100,150))
 deckOfCardImage = ImageTk.PhotoImage(deckOfCardImage)
-deckOfCardButton = tkinter.Button(root, image=deckOfCardImage, command= lambda: [changeCard(), dealCard()])
+deckOfCardButton = tkinter.Button(root, image=deckOfCardImage, command= lambda: [changeCardHand(), dealCard()])
 deckOfCardButton.pack()
+
+dealBoardButton = tkinter.Button(root, text= "Place the board", command = lambda: [changeCardBoard(), setBoard()])
+dealBoardButton.pack()
 
 canvas = tkinter.Canvas(root, width= 600, height= 700)
 
