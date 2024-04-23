@@ -1,6 +1,7 @@
 import poker
 import tkinter
 from tkinter import ttk
+from tkinter import messagebox
 import PIL
 from PIL import Image
 from PIL import ImageTk
@@ -54,13 +55,18 @@ def showCard(suit, rank, width, height):
 
 def dealCard():
     global count, cards, cardSuit, cardRank 
-    card = cards[count]
-    cardSuit = str(card.suit)
-    cardRank = str(card.rank)
-    cardImage = showCard(cardSuit, cardRank, width= 75, height = 100)
-    image_list.append(cardImage)
-    canvas.create_image(20 + (1 + count%5) * 40, 20 + (1 + count //5) * 40, image = cardImage)
-    count = count + 1
+    if count < 2:
+        card = cards[count]
+        cardSuit = str(card.suit)
+        cardRank = str(card.rank)
+        cardImage = showCard(cardSuit, cardRank, width= 75, height = 100)
+        image_list.append(cardImage)
+        canvas.create_image(20 + (1 + count%5) * 70, 20 + (1 + count //5) * 70, image = cardImage)
+        count = count + 1
+    else:
+        message = messagebox.showerror("showerror", "You already have two cards")
+
+        
 
 
 #have a button with the image of the back of the card and pack it and when pressed change a card and add it 
@@ -77,19 +83,10 @@ deckOfCardImage = ImageTk.PhotoImage(deckOfCardImage)
 deckOfCardButton = tkinter.Button(root, image=deckOfCardImage, command= lambda: [changeCard(), dealCard()])
 deckOfCardButton.pack()
 
-canvas = tkinter.Canvas(root, width= 300, height= 400)
+canvas = tkinter.Canvas(root, width= 400, height= 500)
 
 canvas.pack()
 
 
 root.mainloop()
-
-
-
-
-
-
-
-
-
 
