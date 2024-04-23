@@ -8,6 +8,7 @@ from treys import Evaluator
 import random
 
 deck = list(poker.Card)
+random.shuffle(deck)
 cards = []
 board = []
 image_list = []
@@ -18,7 +19,6 @@ boardCount = 0
 
 def changeCardHand():
     global cards
-    random.shuffle(deck)
     card = deck.pop()
     if len(cards) <2:
         cards.append(card)
@@ -26,7 +26,6 @@ def changeCardHand():
 
 def changeCardBoard():
     global board 
-    random.shuffle(deck)
     card = deck.pop()
     if len(board) < 5:
         board.append(card)
@@ -85,7 +84,7 @@ def setBoard():
         cardRank = str(card.rank)
         cardImage = showCard(cardSuit, cardRank, width= 75, height = 100)
         image_list.append(cardImage)
-        canvas.create_image(200 + boardCount*80, 300, width = 75, hight = 100)
+        canvas.create_image(100 + boardCount*100, 200, image = cardImage)
         boardCount = boardCount + 1
     else:
         message = messagebox.showerror("showerror", "The board is already full")
