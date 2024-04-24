@@ -9,6 +9,7 @@ from treys import Evaluator
 from treys import Card
 import random
 import numpy as np
+import math
 
 deck = list(poker.Card)
 random.shuffle(deck)
@@ -18,12 +19,13 @@ image_list = []
 handCount = 0
 boardCount = 0
 
-#Getting the necessary card
+#Getting the necessary card for the hand
 
 def changeCardHand():
     card = deck.pop()
     return card
 
+#Getting the necessary card for the board 
 def changeCardBoard():
     global board 
     card = deck.pop()
@@ -31,6 +33,7 @@ def changeCardBoard():
         board.append(card)
     return card
 
+#Converting into the name for card searching
 def convert_To_Words(suit):
     match suit:
         case "♣":
@@ -42,6 +45,7 @@ def convert_To_Words(suit):
         case "♠":
             return "spades"
 
+#Converting into letter to use eval library 
 def convert_to_Letter(suit):
     match suit:
         case "♣":
@@ -53,6 +57,7 @@ def convert_to_Letter(suit):
         case "♠":
             return "s" 
 
+#displaying the card by finding the image
 def showCard(suit, rank, width, height):
     suit = convert_To_Words(suit)
     image = Image.open(f"PNG-cards-1.3/{rank}_of_{suit}.png")
@@ -61,24 +66,29 @@ def showCard(suit, rank, width, height):
     return image
 
 
+
+#change spacing with the amount of people playing so it works better
+
+#This deals the card to each of the players
 def dealCard():
     global handCount, cards, cardSuit, cardRank, hand
     for i in range(amountOfPlayers):
+        hand = []
         while handCount < 2:
-            hand = []
             card = changeCardHand()
             cardSuit = str(card.suit)
             cardRank = str(card.rank)
             cardImage = showCard(cardSuit, cardRank, width= 75, height = 100)
             image_list.append(cardImage)
-            canvas.create_image((50 + 350*i) + handCount*160, (350 + 100*(i % 2)), image = cardImage)
+            canvas.create_image((50*(2*i+1) + 350*(i + 1)/(i + 2)) + (handCount + 1)*80, (350 + 110*(i % 2)), image = cardImage)
             handCount = handCount + 1
             hand.append(card)
         cards.append(hand)
         handCount = 0
+    print(cards)
 
 
-
+#This sets the board, need to first do flop then other two when adding bets in 
 def setBoard():
     global boardCount, board, cardSuit, cardRank
     while boardCount < 5:
@@ -87,10 +97,10 @@ def setBoard():
         cardRank = str(card.rank)
         cardImage = showCard(cardSuit, cardRank, width= 75, height = 100)
         image_list.append(cardImage)
-        canvas.create_image(300 + boardCount*100, 130, image = cardImage)
+        canvas.create_image(340 + boardCount*100, 130, image = cardImage)
         boardCount = boardCount + 1
 
-
+#Method that evaluates the hand and returns the highest value. Can go and find index then find winner
 def evaluateHand():
     global evalCard, evalBoard
     eval = Evaluator()
@@ -108,7 +118,8 @@ def evaluateHand():
                 card2 = Card.new(a)
                 evalCard.append(card2)
             scores.append(eval.evaluate(evalCard, evalBoard))
-    message = messagebox.showinfo("showinfo", "The max hand evaluation is " + str(np.max(scores)))
+    message = messagebox.showinfo("showinfo", "Player number " + str(scores.index(np.min(scores))) + " was the winner with a " + eval.class_to_string(eval.get_rank_class(np.min(scores))))
+
 
 def getAmountOfPlayers():
     global amountOfPlayers 
@@ -140,7 +151,7 @@ deleteEntryButton.pack()
 
 
 
-canvas = tkinter.Canvas(root, width= 1000, height= 1400)
+canvas = tkinter.Canvas(root, width= 1100, height= 1500)
 
 canvas.pack()
 
