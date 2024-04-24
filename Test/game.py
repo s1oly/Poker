@@ -8,6 +8,7 @@ from PIL import ImageTk
 from treys import Evaluator
 from treys import Card
 import random
+import numpy as np
 
 deck = list(poker.Card)
 random.shuffle(deck)
@@ -20,10 +21,7 @@ boardCount = 0
 #Getting the necessary card
 
 def changeCardHand():
-    global cards
     card = deck.pop()
-    if len(cards) <2:
-        cards.append(card)
     return card
 
 def changeCardBoard():
@@ -63,17 +61,24 @@ def showCard(suit, rank, width, height):
     return image
 
 
-#Need to add in the angle part and that will come in for all of the hands and that finds the highest value hand at the end with the button
 def dealCard():
-    global handCount, cards, cardSuit, cardRank 
-    while handCount < 2:
-        card = changeCardHand()
-        cardSuit = str(card.suit)
-        cardRank = str(card.rank)
-        cardImage = showCard(cardSuit, cardRank, width= 75, height = 100)
-        image_list.append(cardImage)
-        canvas.create_image(200 + handCount*160, 400, image = cardImage)
-        handCount = handCount + 1
+    global handCount, cards, cardSuit, cardRank, hand
+    for i in range(amountOfPlayers):
+        while handCount < 2:
+            print(i)
+            hand = []
+            card = changeCardHand()
+            cardSuit = str(card.suit)
+            cardRank = str(card.rank)
+            cardImage = showCard(cardSuit, cardRank, width= 75, height = 100)
+            image_list.append(cardImage)
+            canvas.create_image((50 + 350*i) + handCount*160, (350 + 100*(i % 2)), image = cardImage)
+            handCount = handCount + 1
+            hand.append(card)
+        cards.append(hand)
+        handCount = 0
+    print(cards)
+
 
 
 def setBoard():
@@ -84,35 +89,38 @@ def setBoard():
         cardRank = str(card.rank)
         cardImage = showCard(cardSuit, cardRank, width= 75, height = 100)
         image_list.append(cardImage)
-        canvas.create_image(100 + boardCount*100, 200, image = cardImage)
+        canvas.create_image(300 + boardCount*100, 130, image = cardImage)
         boardCount = boardCount + 1
 
 
 def evaluateHand():
     global evalCard, evalBoard
     eval = Evaluator()
-    evalCard = []
     evalBoard = []
-    if len(board) == 5 and len(cards) ==2:
-        for card in cards:
-            a = str(card.rank) + convert_to_Letter(str(card.suit))
-            card2 = Card.new(a)
-            evalCard.append(card2)
+    max = 0
+    if len(board) == 5 and len(cards) == amountOfPlayers:
         for card in board:
             a = str(card.rank) + convert_to_Letter(str(card.suit))
             card2 = Card.new(a)
             evalBoard.append(card2)
-    message = messagebox.showinfo("showinfo", "Your hand evaluation is " + str(eval.evaluate(evalCard, evalBoard)))
+        for hands in cards:
+            for card in hands:
+                evalCard = []
+                a = str(card.rank) + convert_to_Letter(str(card.suit))
+                card2 = Card.new(a)
+                evalCard.append(card2)
+            max = np.max(max, eval.evaluate(evalCard, evalBoard))
+    message = messagebox.showinfo("showinfo", "The max hand evaluation is " + str(max))
 
 def getAmountOfPlayers():
-    global amount 
-    amount = entry.get()
+    global amountOfPlayers 
+    amountOfPlayers = int(entry.get())
     entry.destroy()
-    print(amount)
+    print(amountOfPlayers)
         
 
 root = tkinter.Tk()
-root.geometry("800x1000")
+root.geometry("1500x1700")
 root.title("Poker Game")
 
 deckOfCardImage = Image.open(f"PNG-cards-1.3/card_back_red.png")
@@ -135,7 +143,7 @@ deleteEntryButton.pack()
 
 
 
-canvas = tkinter.Canvas(root, width= 600, height= 700)
+canvas = tkinter.Canvas(root, width= 1000, height= 1400)
 
 canvas.pack()
 
