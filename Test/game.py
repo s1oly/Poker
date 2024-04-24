@@ -63,8 +63,7 @@ def showCard(suit, rank, width, height):
     return image
 
 
-#need to tune the spacing a bit + as well as allow for multiple lists to find hand evaluations
-#need to differentiate the amount 
+#Need to add in the angle part and that will come in for all of the hands and that finds the highest value hand at the end with the button
 def dealCard():
     global handCount, cards, cardSuit, cardRank 
     while handCount < 2:
@@ -104,16 +103,17 @@ def evaluateHand():
             card2 = Card.new(a)
             evalBoard.append(card2)
     message = messagebox.showinfo("showinfo", "Your hand evaluation is " + str(eval.evaluate(evalCard, evalBoard)))
+
+def getAmountOfPlayers():
+    global amount 
+    amount = entry.get()
+    entry.destroy()
+    print(amount)
         
 
-
-
-
-root = tkinter.Tk(screenName= "Poker Game")
+root = tkinter.Tk()
 root.geometry("800x1000")
-
-
-
+root.title("Poker Game")
 
 deckOfCardImage = Image.open(f"PNG-cards-1.3/card_back_red.png")
 deckOfCardImage = deckOfCardImage.resize((100,150))
@@ -126,6 +126,14 @@ dealBoardButton.pack()
 
 handEvaluationButton = tkinter.Button(root, text = "Evaluate your Hand", command =  lambda : [evaluateHand()])
 handEvaluationButton.pack()
+
+entry = Entry(root)
+entry.pack()
+
+deleteEntryButton= tkinter.Button(root, text = "Entry how many players you want", command = lambda : [getAmountOfPlayers(), deleteEntryButton.destroy()])
+deleteEntryButton.pack()
+
+
 
 canvas = tkinter.Canvas(root, width= 600, height= 700)
 
