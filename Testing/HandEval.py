@@ -5,6 +5,7 @@ from tkinter import messagebox
 from PIL import Image
 from PIL import ImageTk
 from treys import Evaluator
+from treys import Card
 import random
 
 deck = list(poker.Card)
@@ -31,17 +32,6 @@ def changeCardBoard():
         board.append(card)
     return card
 
-
-# def updateCardImage():
-#     global canvas, cardImage
-#     cardImage = showCard(cardSuit, cardRank, width= 150, height=200)
-#     canvas.itemconfig(card_image_id, image = cardImage)
-
-# def updateCardLabel():
-#     global cardLabel
-#     text = cardRank + " of " + cardSuit
-#     cardLabel.config(text = text)
-
 def convert_To_Words(suit):
     match suit:
         case "♣":
@@ -52,6 +42,17 @@ def convert_To_Words(suit):
             return "hearts"
         case "♠":
             return "spades"
+
+def convert_to_Letter(suit):
+    match suit:
+        case "♣":
+            return "c"
+        case "♦":
+            return "d"
+        case "♥":
+            return "h"
+        case "♠":
+            return "s" 
 
 def showCard(suit, rank, width, height):
     suit = convert_To_Words(suit)
@@ -77,7 +78,7 @@ def dealCard():
         message = messagebox.showerror("showerror", "You already have two cards")
 
 def setBoard():
-    global boardCount, cards, cardSuit, cardRank
+    global boardCount, board, cardSuit, cardRank
     if boardCount < 5:
         card = board[boardCount]
         cardSuit = str(card.suit)
@@ -88,6 +89,23 @@ def setBoard():
         boardCount = boardCount + 1
     else:
         message = messagebox.showerror("showerror", "The board is already full")
+
+def evaluateHand():
+    global evalCard, evalBoard
+    eval = Evaluator()
+    evalCard = []
+    evalBoard = []
+    if len(board) == 5 and len(cards) ==2:
+        for card in cards:
+            a = str(card.rank) + convert_to_Letter(str(card.suit))
+            card2 = Card.new(a)
+            evalCard.append(card2)
+        for card in board:
+            a = str(card.rank) + convert_to_Letter(str(card.suit))
+            card2 = Card.new(a)
+            evalBoard.append(card2)
+        print(eval.evaluate(evalCard, evalBoard))
+
 
 
 
@@ -104,9 +122,13 @@ deckOfCardButton.pack()
 dealBoardButton = tkinter.Button(root, text= "Place the board", command = lambda: [changeCardBoard(), setBoard()])
 dealBoardButton.pack()
 
+handEvaluationButton = tkinter.Button(root, text = "Evaluate your Hand", command =  lambda : [evaluateHand()])
+handEvaluationButton.pack()
+
 canvas = tkinter.Canvas(root, width= 600, height= 700)
 
 canvas.pack()
+
 
 
 root.mainloop()
