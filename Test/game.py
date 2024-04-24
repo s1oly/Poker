@@ -65,7 +65,6 @@ def dealCard():
     global handCount, cards, cardSuit, cardRank, hand
     for i in range(amountOfPlayers):
         while handCount < 2:
-            print(i)
             hand = []
             card = changeCardHand()
             cardSuit = str(card.suit)
@@ -77,7 +76,6 @@ def dealCard():
             hand.append(card)
         cards.append(hand)
         handCount = 0
-    print(cards)
 
 
 
@@ -97,7 +95,7 @@ def evaluateHand():
     global evalCard, evalBoard
     eval = Evaluator()
     evalBoard = []
-    max = 0
+    scores = []
     if len(board) == 5 and len(cards) == amountOfPlayers:
         for card in board:
             a = str(card.rank) + convert_to_Letter(str(card.suit))
@@ -109,14 +107,13 @@ def evaluateHand():
                 a = str(card.rank) + convert_to_Letter(str(card.suit))
                 card2 = Card.new(a)
                 evalCard.append(card2)
-            max = np.max(max, eval.evaluate(evalCard, evalBoard))
-    message = messagebox.showinfo("showinfo", "The max hand evaluation is " + str(max))
+            scores.append(eval.evaluate(evalCard, evalBoard))
+    message = messagebox.showinfo("showinfo", "The max hand evaluation is " + str(np.max(scores)))
 
 def getAmountOfPlayers():
     global amountOfPlayers 
     amountOfPlayers = int(entry.get())
     entry.destroy()
-    print(amountOfPlayers)
         
 
 root = tkinter.Tk()
