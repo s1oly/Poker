@@ -2,6 +2,7 @@ import poker
 import tkinter
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import Entry
 from PIL import Image
 from PIL import ImageTk
 from treys import Evaluator
@@ -66,29 +67,27 @@ def showCard(suit, rank, width, height):
 #need to differentiate the amount 
 def dealCard():
     global handCount, cards, cardSuit, cardRank 
-    if handCount < 2:
-        card = cards[handCount]
+    while handCount < 2:
+        card = changeCardHand()
         cardSuit = str(card.suit)
         cardRank = str(card.rank)
         cardImage = showCard(cardSuit, cardRank, width= 75, height = 100)
         image_list.append(cardImage)
         canvas.create_image(200 + handCount*160, 400, image = cardImage)
         handCount = handCount + 1
-    else:
-        message = messagebox.showerror("showerror", "You already have two cards")
+
 
 def setBoard():
     global boardCount, board, cardSuit, cardRank
-    if boardCount < 5:
-        card = board[boardCount]
+    while boardCount < 5:
+        card = changeCardBoard()
         cardSuit = str(card.suit)
         cardRank = str(card.rank)
         cardImage = showCard(cardSuit, cardRank, width= 75, height = 100)
         image_list.append(cardImage)
         canvas.create_image(100 + boardCount*100, 200, image = cardImage)
         boardCount = boardCount + 1
-    else:
-        message = messagebox.showerror("showerror", "The board is already full")
+
 
 def evaluateHand():
     global evalCard, evalBoard
@@ -104,6 +103,7 @@ def evaluateHand():
             a = str(card.rank) + convert_to_Letter(str(card.suit))
             card2 = Card.new(a)
             evalBoard.append(card2)
+    message = messagebox.showinfo("showinfo", "Your hand evaluation is " + str(eval.evaluate(evalCard, evalBoard)))
         
 
 
@@ -113,13 +113,15 @@ root = tkinter.Tk(screenName= "Poker Game")
 root.geometry("800x1000")
 
 
+
+
 deckOfCardImage = Image.open(f"PNG-cards-1.3/card_back_red.png")
 deckOfCardImage = deckOfCardImage.resize((100,150))
 deckOfCardImage = ImageTk.PhotoImage(deckOfCardImage)
-deckOfCardButton = tkinter.Button(root, image=deckOfCardImage, command= lambda: [changeCardHand(), dealCard()])
+deckOfCardButton = tkinter.Button(root, image=deckOfCardImage, command= lambda: [dealCard()])
 deckOfCardButton.pack()
 
-dealBoardButton = tkinter.Button(root, text= "Place the board", command = lambda: [changeCardBoard(), setBoard()])
+dealBoardButton = tkinter.Button(root, text= "Place the board", command = lambda: [setBoard()])
 dealBoardButton.pack()
 
 handEvaluationButton = tkinter.Button(root, text = "Evaluate your Hand", command =  lambda : [evaluateHand()])
@@ -132,4 +134,3 @@ canvas.pack()
 
 
 root.mainloop()
-
