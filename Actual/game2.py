@@ -16,6 +16,7 @@ random.shuffle(deck)
 cards = []
 board = []
 image_list = []
+canvas_list = []
 handCount = 0
 boardCount = 0
 
@@ -124,7 +125,17 @@ def evaluateHand():
 def getAmountOfPlayers():
     global amountOfPlayers 
     amountOfPlayers = int(playerEntry.get())
-    playerEntry.destroy()    
+    playerEntry.destroy() 
+
+
+#First need to make each of the images a button. Then when the button is pressed, change the image to the image stored in the
+#same index's that will be passed in to the button. Then that will swap the image with the index of the image in imagelist. 
+#then we check for the image and see if they are equal or not. 
+
+def flipImage(index):
+    return 0 # placeholder
+
+   
 
 root = tkinter.Tk()
 root.geometry("1500x1700")
