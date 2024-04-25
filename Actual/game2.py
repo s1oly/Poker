@@ -18,6 +18,7 @@ board = []
 image_listHand = []
 image_listBoard = []
 button_list = []
+back_imageList = []
 handCount = 0
 boardCount = 0
 
@@ -141,6 +142,7 @@ def flipImage(index):
         backImage = Image.open(f"PNG-cards-1.3/card_back_black.png")
         backImage = backImage.resize((75, 100))
         backImage = ImageTk.PhotoImage(backImage)
+        back_imageList.append(backImage)
         button_list[index].config(image = backImage)
     else:
         button_list[index].config(image = image_listHand[index])
