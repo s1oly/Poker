@@ -15,8 +15,9 @@ deck = list(poker.Card)
 random.shuffle(deck)
 cards = []
 board = []
-image_list = []
-canvas_list = []
+image_listHand = []
+image_listBoard = []
+button_list = []
 handCount = 0
 boardCount = 0
 
@@ -80,13 +81,16 @@ def dealCard():
             cardSuit = str(card.suit)
             cardRank = str(card.rank)
             cardImage = showCard(cardSuit, cardRank, width= 75, height = 100)
-            image_list.append(cardImage)
-            canvas.create_image((50*(2*i+1) + 350*(i + 1)/(i + 2)) + (handCount + 1)*80, (350 + 110*(i % 2)), image = cardImage)
+            image_listHand.append(cardImage)
+            # canvas.create_image((50*(2*i+1) + 350*(i + 1)/(i + 2)) + (handCount + 1)*80, (350 + 110*(i % 2)), image = cardImage)
+            cardButton = tkinter.Button(canvas, image = cardImage, command = lambda index = image_listHand.index(cardImage): [flipImage(index)])
+            button_list.append(cardButton)
+            cardButton.place(x = (50*(2*i+1) + 350*(i + 1)/(i + 2)) + (handCount + 1)*80, y = (300 + 110*(i % 2)))
             handCount = handCount + 1
             hand.append(card)
         cards.append(hand)
         handCount = 0
-    print(cards)
+
 
 
 #This sets the board, need to first do flop then other two when adding bets in 
@@ -97,7 +101,7 @@ def setBoard():
         cardSuit = str(card.suit)
         cardRank = str(card.rank)
         cardImage = showCard(cardSuit, cardRank, width= 75, height = 100)
-        image_list.append(cardImage)
+        image_listBoard.append(cardImage)
         canvas.create_image(340 + boardCount*100, 130, image = cardImage)
         boardCount = boardCount + 1
 
@@ -133,7 +137,13 @@ def getAmountOfPlayers():
 #then we check for the image and see if they are equal or not. 
 
 def flipImage(index):
-    return 0 # placeholder
+    if button_list[index].cget('image') == str(image_listHand[index]):
+        backImage = Image.open(f"PNG-cards-1.3/card_back_black.png")
+        backImage = backImage.resize((75, 100))
+        backImage = ImageTk.PhotoImage(backImage)
+        button_list[index].config(image = backImage)
+    else:
+        button_list[index].config(image = image_listHand[index])
 
    
 
