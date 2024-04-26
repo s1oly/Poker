@@ -90,7 +90,7 @@ def dealCard():
             back_imageList.append(backImage)
             cardButton = tkinter.Button(canvas, image = backImage, command = lambda index = image_listHand.index(cardImage): [flipImage(index)])
             button_list.append(cardButton)
-            cardButton.place(x = (50*(2*i+1) + 350*(i + 1)/(i + 2)) + (handCount + 1)*80, y = (300 + 110*(i % 2)))
+            cardButton.place(x = (-25 * amountOfPlayers) + (50*(2*i+1) + 120*(i + 1)) + (handCount + 1)*80, y = (300))
             handCount = handCount + 1
             hand.append(card)
         cards.append(hand)
@@ -117,7 +117,7 @@ def evaluateHand():
     eval = Evaluator()
     evalBoard = []
     scores = []
-    if len(board) == 5 and len(cards) == amountOfPlayers:
+    if len(board) == 5 and len(cards)%amountOfPlayers == 0: 
         for card in board:
             a = str(card.rank) + convert_to_Letter(str(card.suit))
             card2 = Card.new(a)
