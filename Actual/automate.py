@@ -129,7 +129,7 @@ def evaluateHand():
                 card2 = Card.new(a)
                 evalCard.append(card2)
             scores.append(eval.evaluate(evalCard, evalBoard))
-    message = messagebox.showinfo("showinfo", "Player number " + str(scores.index(np.min(scores))) + " was the winner with a " + eval.class_to_string(eval.get_rank_class(np.min(scores))))
+    message = messagebox.showinfo("showinfo", "Player number " + str(scores.index(np.min(scores)) % amountOfPlayers + 1) + " was the winner with a " + eval.class_to_string(eval.get_rank_class(np.min(scores))))
 
 #gets the global amount of players
 def getAmountOfPlayers():
