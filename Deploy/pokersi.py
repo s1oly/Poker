@@ -20,6 +20,7 @@ image_listBoard = []
 button_list = []
 back_imageList = []
 money = []
+has_folded = []
 handCount = 0
 boardCount = 0
 boardButtonPressCount = 0
@@ -90,7 +91,7 @@ def dealCard():
             backImage = backImage.resize((75, 100))
             backImage = ImageTk.PhotoImage(backImage)
             back_imageList.append(backImage)
-            cardButton = tkinter.Button(canvas, image = backImage, text = str(getPlayerMoney(i)), compound = "bottom", command = lambda index = image_listHand.index(cardImage): [flipImage(index)])
+            cardButton = tkinter.Button(canvas, image = backImage, text = getPlayerMoney(i), compound = "top", command = lambda index = image_listHand.index(cardImage): [flipImage(index)])
             button_list.append(cardButton)
             cardButton.place(x = (-25 * amountOfPlayers) + (50*(2*i+1) + 120*(i + 1)) + (handCount + 1)*80, y = (300))
             handCount = handCount + 1
@@ -149,7 +150,7 @@ def evaluateHand():
                 card2 = Card.new(a)
                 evalCard.append(card2)
             scores.append(eval.evaluate(evalCard, evalBoard))
-    message = messagebox.showinfo("showinfo", "Player number " + str(scores.index(np.min(scores)) % amountOfPlayers + 1) + " was the winner with a " + eval.class_to_string(eval.get_rank_class(np.min(scores))))
+    message = messagebox.showinfo("showinfo", "Player number " + str(scores.index(np.min(scores))+ 1) + " was the winner with a " + eval.class_to_string(eval.get_rank_class(np.min(scores))))
 
 def getAmountOfPlayers():
     '''Gets the global amount of players'''
@@ -173,19 +174,63 @@ def loadMoney():
         money.append(potValue)
     potEntry.destroy()
 
+#In this method, need to update 
 def trackMoney():
     '''Counts the money in the pot and the money for each player'''
-    global currentRaise, currentBets, hasRaised
-    currentRaise = 0
+    global currentBet, currentBets, hasRaised, entry
+    currentBet = 0
     currentBets = []
     hasRaised = []
+    bet_entryList = []
+    for i in range(len(cards)):
+        hasRaised.append(False)
+        has_folded.append(False)
+        currentBets.append(0)
+
+    for i in range(len(cards)):
+        if has_folded[i]:
+            continue
+        else:
+            if not hasRaised[i]:
+                entry = Entry(root, textvariable= "Do you choose to raise, check, or fold?")
+                entry.pack()
+                bet_entryList.append(entry)
+                if entry.get() == "Raise":
+                    entry.selection_clear()
+                    entry.config(textvariable= "How much do you want to raise by?")
+                    currentBet = int(entry.get())
+                    hasRaised[i] = True
+                    money[i] = money[i] - (currentBet - currentBets[i])
+                    currentBets[i] = currentBet
+                elif entry.get() == "Check":
+                    entry.selection_clear()
+                    money[i] = money[i] - (currentBet - currentBets[i])
+                    currentBets[i] = currentBet
+                elif entry.get() == "Fold":
+                    entry.selection_clear()
+                    has_folded[i] = True
+            else:
+                entry = Entry(root, textvariable= "Do you choose to check or fold?")
+                entry.pack()
+                bet_entryList.append(entry)
+                if entry.get() == "Check":
+                    entry.selection_clear()
+                    money[i] = money[i] - (currentBet - currentBets[i])
+                    currentBets[i] = currentBet
+                elif entry.get() == "Fold":
+                    entry.selection_clear()
+                    has_folded[i] = True
+
+    for index in range(len(image_listHand)):
+        button_list[index].config(text = getPlayerMoney(index//2))
 
 
 def getPlayerMoney(index):
     return str(money[index])
 
 
-#Need to show each money value with a lambda, as well as show ways to transfer money and have continous 
+#Need to show each money value with a lambda, 
+#as well as show ways to transfer money and have continous games
 
    
 
@@ -216,6 +261,9 @@ potEntry.pack()
 
 potButton = tkinter.Button(root, text = "What is the pot value?", command= lambda :[loadMoney(), potButton.destroy()])
 potButton.pack()
+
+betButton = tkinter.Button(root, text = "Bets for the round", command= lambda:[trackMoney(), betButton.destroy()])
+betButton.place(x = 100, y = 10)
 
 
 canvas = tkinter.Canvas(root, width= 1100, height= 1500)
