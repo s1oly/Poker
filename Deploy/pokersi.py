@@ -93,7 +93,7 @@ def dealCard():
             back_imageList.append(backImage)
             cardButton = tkinter.Button(canvas, image = backImage, text = getPlayerMoney(i), compound = "top", command = lambda index = image_listHand.index(cardImage): [flipImage(index)])
             button_list.append(cardButton)
-            cardButton.place(x = (-25 * amountOfPlayers) + (50*(2*i+1) + 120*(i + 1)) + (handCount + 1)*80, y = (300))
+            cardButton.place(x = (-16 * amountOfPlayers) + (55*(2*i+1) + 125*(i + 1)) + (handCount + 1)*80, y = (300))
             handCount = handCount + 1
             hand.append(card)
         cards.append(hand)
@@ -110,7 +110,7 @@ def setBoard():
         cardRank = str(card.rank)
         cardImage = showCard(cardSuit, cardRank, width= 75, height = 100)
         image_listBoard.append(cardImage)
-        canvas.create_image(340 + boardCount*100, 130, image = cardImage)
+        canvas.create_image(500 + boardCount*100, 130, image = cardImage)
         boardCount = boardCount + 1
     while boardCount < 4 and boardButtonPressCount < 2 and boardButtonPressCount >= 1:
         card = changeCardBoard()
@@ -118,7 +118,7 @@ def setBoard():
         cardRank = str(card.rank)
         cardImage = showCard(cardSuit, cardRank, width= 75, height = 100)
         image_listBoard.append(cardImage)
-        canvas.create_image(340 + boardCount*100, 130, image = cardImage)
+        canvas.create_image(500 + boardCount*100, 130, image = cardImage)
         boardCount = boardCount + 1
     while boardCount < 5 and boardButtonPressCount < 3 and boardButtonPressCount >=2:
         card = changeCardBoard()
@@ -126,7 +126,7 @@ def setBoard():
         cardRank = str(card.rank)
         cardImage = showCard(cardSuit, cardRank, width= 75, height = 100)
         image_listBoard.append(cardImage)
-        canvas.create_image(340 + boardCount*100, 130, image = cardImage)
+        canvas.create_image(500 + boardCount*100, 130, image = cardImage)
         boardCount = boardCount + 1
     boardButtonPressCount = boardButtonPressCount + 1
     
@@ -134,7 +134,7 @@ def setBoard():
 #Method that evaluates the hand and returns the highest value. Can go and find index then find winner
 def evaluateHand():
     '''Method that evaluates the hand and returns the winner.'''
-    global evalCard, evalBoard
+    global evalCard, evalBoard, scores
     eval = Evaluator()
     evalBoard = []
     scores = []
@@ -174,7 +174,7 @@ def loadMoney():
         money.append(potValue)
     potEntry.destroy()
 
-#In this method, need to update 
+#Fix this method by making the entries with one button, and then button spawns under and creates new buttons and stuff like that
 def trackMoney():
     '''Counts the money in the pot and the money for each player'''
     global currentBet, currentBets, hasRaised, entry
@@ -192,12 +192,11 @@ def trackMoney():
             continue
         else:
             if not hasRaised[i]:
-                entry = Entry(root, textvariable= "Do you choose to raise, check, or fold?")
-                entry.pack()
+                entry = Entry(canvas)
+                entry.place(x = button_list[i * 2].winfo_x(), y = button_list[i*2].winfo_y() + 200)
                 bet_entryList.append(entry)
                 if entry.get() == "Raise":
                     entry.selection_clear()
-                    entry.config(textvariable= "How much do you want to raise by?")
                     currentBet = int(entry.get())
                     hasRaised[i] = True
                     money[i] = money[i] - (currentBet - currentBets[i])
@@ -209,9 +208,11 @@ def trackMoney():
                 elif entry.get() == "Fold":
                     entry.selection_clear()
                     has_folded[i] = True
+                else:
+                    message = messagebox.showinfo("showinfo", "Chose an action, Raise, Check, or Fold.")
             else:
-                entry = Entry(root, textvariable= "Do you choose to check or fold?")
-                entry.pack()
+                entry = Entry(canvas)
+                entry.place(x = button_list[i * 2].winfo_x(), y = button_list[i*2].winfo_y() + 200)
                 bet_entryList.append(entry)
                 if entry.get() == "Check":
                     entry.selection_clear()
@@ -253,8 +254,8 @@ handEvaluationButton.place(x = 1170, y = 10)
 playerEntry = Entry(root)
 playerEntry.pack()
 
-deleteEntryButton= tkinter.Button(root, text = "Entry how many players you want", command = lambda : [getAmountOfPlayers(), deleteEntryButton.destroy()])
-deleteEntryButton.pack()
+entryButton= tkinter.Button(root, text = "Entry how many players you want", command = lambda : [getAmountOfPlayers(), entryButton.destroy()])
+entryButton.pack()
 
 potEntry = Entry(root)
 potEntry.pack()
@@ -262,11 +263,11 @@ potEntry.pack()
 potButton = tkinter.Button(root, text = "What is the pot value?", command= lambda :[loadMoney(), potButton.destroy()])
 potButton.pack()
 
-betButton = tkinter.Button(root, text = "Bets for the round", command= lambda:[trackMoney(), betButton.destroy()])
+betButton = tkinter.Button(root, text = "Bets for the round", command= lambda:[trackMoney()])
 betButton.place(x = 100, y = 10)
 
 
-canvas = tkinter.Canvas(root, width= 1100, height= 1500)
+canvas = tkinter.Canvas(root, width= 1500, height= 1500)
 
 canvas.pack()
 
