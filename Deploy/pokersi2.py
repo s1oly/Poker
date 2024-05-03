@@ -30,6 +30,8 @@ has_folded = []
 handCount = 0
 boardCount = 0
 boardButtonPressCount = 0
+currentPot = 0
+currentBets = []
 #Getting the necessary card for the hand
 
 def changeCardHand():
@@ -183,14 +185,13 @@ def loadMoney():
     potValue = int(potEntry.get())
     for i in range(amountOfPlayers):
         money.append(potValue)
+        currentBets.append(0)
     potEntry.destroy()
 
 #Fix this method by making the entries with one button, and then button spawns under and creates new buttons and stuff like that
 def startBetting():
     '''Counts the money in the pot and the money for each player'''
-    global currentPot, currentBets, hasRaised, entry, hasBet
-    currentPot = 0
-    currentBets = []
+    global hasRaised, entry, hasBet
     hasRaised = []
     bet_entryList = []
     bet_buttonList = []
@@ -198,7 +199,7 @@ def startBetting():
     for i in range(len(cards)):
         hasRaised.append(False)
         has_folded.append(False)
-        currentBets.append(0)
+        # currentBets.append(0)
     for i in range(len(cards)):
         if has_folded[i]:
             continue
@@ -220,53 +221,54 @@ def startBetting():
                 button = tkinter.Button(canvas, text = "Submit a Call or Fold", command = lambda index = i: [trackMoney(bet_entryList[index].get(), index), bet_entryList[index].destroy(), bet_buttonList[index].destroy()])
                 bet_buttonList.append(button)
                 button.place(x = button_list[i*2].winfo_x(), y = button_list[i*2].winfo_y() + 275)
-                
+
     #this has already been done instantly without waiting for the bets
-    bet_entryList2 = []
-    bet_buttonList2 = []
-    for i in range(len(cards)):
-        if has_folded[i]: 
-            continue
-        elif money[i] == 0:
-            continue
-        else:
-            if currentBets[i] < currentPot:
-                entry = Entry(canvas)
-                entry.place(x = button_list[i * 2].winfo_x(), y = button_list[i*2].winfo_y() + 200)
-                bet_entryList2.append(entry)
-                button = tkinter.Button(canvas, text = "Submit a Call or Fold", command = lambda index = i: [trackMoney(bet_entryList2[index].get(), index), bet_entryList2[index].destroy(), bet_buttonList2[index].destroy()])
-                bet_buttonList2.append(button)
-                button.place(x = button_list[i*2].winfo_x(), y = button_list[i*2].winfo_y() + 275)
+    # bet_entryList2 = []
+    # bet_buttonList2 = []
+    # for i in range(len(cards)):
+    #     if has_folded[i]: 
+    #         continue
+    #     elif money[i] == 0:
+    #         continue
+    #     else:
+    #         if currentBets[i] < currentPot:
+    #             entry = Entry(canvas)
+    #             entry.place(x = button_list[i * 2].winfo_x(), y = button_list[i*2].winfo_y() + 200)
+    #             bet_entryList2.append(entry)
+    #             button = tkinter.Button(canvas, text = "Submit a Call or Fold", command = lambda index = i: [trackMoney(bet_entryList2[index].get(), index), bet_entryList2[index].destroy(), bet_buttonList2[index].destroy()])
+    #             bet_buttonList2.append(button)
+    #             button.place(x = button_list[i*2].winfo_x(), y = button_list[i*2].winfo_y() + 275)
 
 
 
 #Need to fix the trackMoney Method, make new entries and buttons for raise and other stuff 
 #need to add checks such that you are not betting more than you have money for
 def trackMoney(action, index):
-    global currentPot, currentBets, hasRaised
+    global hasRaised, currentBets, currentPot
     ''' This method causes the amount of money to be given and collected'''
     if action == "Fold":
         has_folded[index] = True
     else:
-        if int(action) > currentPot: # Raise
+        if int(action) + currentBets[index] > currentPot: # Raise
             hasRaised[index] = True
-            currentPot = int(action)
+            currentPot = int(action) + currentBets[index]
+            money[index] = money[index] - (int(action))
             currentBets[index] = currentPot
-            money[index] = money[index] - (currentBets[index])
         elif int(action) + currentBets[index] == currentPot: # Call
             money[index] = money[index] - (int(action))
             currentBets[index] = currentPot
-    
+            
     for index in range(len(image_listHand)):
         button_list[index].config(text = getPlayerMoney(index//2))
+
     currentMoneyLabel.config(text = "Current Bet " + str(currentPot))
     
     
 #need to make a button that gives the winner the current bet amount of money afterwards
 def awardWinner():
-    global currentPot, scores, money
-    index = scores.index[minScore]
-    money[index] = money[index] + currentPot
+    global currentPot, scores, money, minScore, amountOfPlayers
+    index = scores.index(minScore)
+    money[index] = money[index] + currentPot * amountOfPlayers
     for index in range(len(image_listHand)):
         button_list[index].config(text = getPlayerMoney(index//2))
 
@@ -322,7 +324,7 @@ potButton.pack()
 betButton = tkinter.Button(root, text = "Bets for the round", command= lambda:[startBetting()])
 betButton.place(x = 75, y = 10)
 
-currentMoneyLabel = tkinter.Label(root, text= "Current Bet: " + str(0), padx= 5, pady= 5)
+currentMoneyLabel = tkinter.Label(root, text= "Current Pot: " + str(0), padx= 5, pady= 5)
 currentMoneyLabel.place(x = 250, y = 10)
 
 awardWinnerButton = tkinter.Button(root, text = "Pay out for the Round", command = lambda: [awardWinner()])
