@@ -9,7 +9,6 @@ from treys import Evaluator
 from treys import Card
 import random
 import numpy as np
-import math
 
 
 
@@ -139,12 +138,14 @@ def setBoard():
     
 
 #Method that evaluates the hand and returns the highest value. Can go and find index then find winner
+#Make sure that it only goes through cards that are not folded
 def evaluateHand():
     '''Method that evaluates the hand and returns the winner.'''
-    global evalCard, evalBoard, scores
+    global evalCard, evalBoard, scores, minScore
     eval = Evaluator()
     evalBoard = []
     scores = []
+    minScore = 10000000
     if len(board) == 5 and len(cards)%amountOfPlayers == 0: 
         for card in board:
             a = str(card.rank) + convert_to_Letter(str(card.suit))
@@ -157,7 +158,10 @@ def evaluateHand():
                 card2 = Card.new(a)
                 evalCard.append(card2)
             scores.append(eval.evaluate(evalCard, evalBoard))
-    message = messagebox.showinfo("showinfo", "Player number " + str(scores.index(np.min(scores))+ 1) + " was the winner with a " + eval.class_to_string(eval.get_rank_class(np.min(scores))))
+    for i in range(len(scores)):
+        if not has_folded[i] and scores[i] < minScore:
+            minScore = scores[i]
+    message = messagebox.showinfo("showinfo", "Player number " + str(scores.index(minScore)+ 1) + " was the winner with a " + eval.class_to_string(eval.get_rank_class(np.min(scores))))
 
 def getAmountOfPlayers():
     '''Gets the global amount of players'''
@@ -184,18 +188,22 @@ def loadMoney():
 #Fix this method by making the entries with one button, and then button spawns under and creates new buttons and stuff like that
 def startBetting():
     '''Counts the money in the pot and the money for each player'''
-    global currentPot, currentBets, hasRaised, entry
+    global currentPot, currentBets, hasRaised, entry, hasBet
     currentPot = 0
     currentBets = []
     hasRaised = []
     bet_entryList = []
     bet_buttonList = []
+    hasBet = False
     for i in range(len(cards)):
         hasRaised.append(False)
         has_folded.append(False)
         currentBets.append(0)
     for i in range(len(cards)):
         if has_folded[i]:
+            continue
+        elif money[i] == 0:
+            message = messagebox.showwarning("showwarning", "You do not have any money to bet")
             continue
         else:
             if not hasRaised[i]:
@@ -212,10 +220,28 @@ def startBetting():
                 button = tkinter.Button(canvas, text = "Submit a Call or Fold", command = lambda index = i: [trackMoney(bet_entryList[index].get(), index), bet_entryList[index].destroy(), bet_buttonList[index].destroy()])
                 bet_buttonList.append(button)
                 button.place(x = button_list[i*2].winfo_x(), y = button_list[i*2].winfo_y() + 275)
+                
+    #this has already been done instantly without waiting for the bets
+    bet_entryList2 = []
+    bet_buttonList2 = []
+    for i in range(len(cards)):
+        if has_folded[i]: 
+            continue
+        elif money[i] == 0:
+            continue
+        else:
+            if currentBets[i] < currentPot:
+                entry = Entry(canvas)
+                entry.place(x = button_list[i * 2].winfo_x(), y = button_list[i*2].winfo_y() + 200)
+                bet_entryList2.append(entry)
+                button = tkinter.Button(canvas, text = "Submit a Call or Fold", command = lambda index = i: [trackMoney(bet_entryList2[index].get(), index), bet_entryList2[index].destroy(), bet_buttonList2[index].destroy()])
+                bet_buttonList2.append(button)
+                button.place(x = button_list[i*2].winfo_x(), y = button_list[i*2].winfo_y() + 275)
 
 
 
 #Need to fix the trackMoney Method, make new entries and buttons for raise and other stuff 
+#need to add checks such that you are not betting more than you have money for
 def trackMoney(action, index):
     global currentPot, currentBets, hasRaised
     ''' This method causes the amount of money to be given and collected'''
@@ -236,10 +262,27 @@ def trackMoney(action, index):
     currentMoneyLabel.config(text = "Current Bet " + str(currentPot))
     
     
+#need to make a button that gives the winner the current bet amount of money afterwards
+def awardWinner():
+    global currentPot, scores, money
+    index = scores.index[minScore]
+    money[index] = money[index] + currentPot
+    for index in range(len(image_listHand)):
+        button_list[index].config(text = getPlayerMoney(index//2))
+
 
 
 def getPlayerMoney(index):
     return str(money[index])
+
+
+#Method to check if everyone has either folded or placed a bet
+def check():
+    global has_folded, currentBets
+    for index in range(len(cards)):
+        if not has_folded[index] and currentBets[index] == 0:
+            return False
+    return True
 
 
 
@@ -259,7 +302,7 @@ deckOfCardButton = tkinter.Button(root, image=deckOfCardImage, command= lambda: 
 deckOfCardButton.pack()
 
 dealBoardButton = tkinter.Button(root, text= "Place the board", command = lambda: [setBoard()])
-dealBoardButton.place(x = 1000, y = 10)
+dealBoardButton.place(x = 1020, y = 10)
 
 handEvaluationButton = tkinter.Button(root, text = "Evaluate your Hand", command =  lambda : [evaluateHand()])
 handEvaluationButton.place(x = 1170, y = 10)
@@ -273,7 +316,7 @@ entryButton.pack()
 potEntry = Entry(root)
 potEntry.pack()
 
-potButton = tkinter.Button(root, text = "What is the pot value?", command= lambda :[loadMoney(), potButton.destroy()])
+potButton = tkinter.Button(root, text = "What is the buy in value?", command= lambda :[loadMoney(), potButton.destroy()])
 potButton.pack()
 
 betButton = tkinter.Button(root, text = "Bets for the round", command= lambda:[startBetting()])
@@ -281,6 +324,9 @@ betButton.place(x = 75, y = 10)
 
 currentMoneyLabel = tkinter.Label(root, text= "Current Bet: " + str(0), padx= 5, pady= 5)
 currentMoneyLabel.place(x = 250, y = 10)
+
+awardWinnerButton = tkinter.Button(root, text = "Pay out for the Round", command = lambda: [awardWinner()])
+awardWinnerButton.place(x = 400, y = 10)
 
 
 canvas = tkinter.Canvas(root, width= 1500, height= 1500)
