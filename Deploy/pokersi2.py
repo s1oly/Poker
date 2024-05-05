@@ -11,11 +11,7 @@ import random
 import numpy as np
 
 
-
-
-# TODO: To fix the error for the gaame, just make the first thing a riase of a bet depending on the amount of money
-#that the current bet is. For example, is the current bet is 5 and someone bets 8 then they have raised and 
-# that boolean is marked true. 
+#Quick fix to the issue of the fold first fucks up the game is to make entries and button for fold and zero money but not show them
 
 deck = list(poker.Card)
 random.shuffle(deck)
@@ -222,23 +218,6 @@ def startBetting():
                 bet_buttonList.append(button)
                 button.place(x = button_list[i*2].winfo_x(), y = button_list[i*2].winfo_y() + 275)
 
-    #this has already been done instantly without waiting for the bets
-    # bet_entryList2 = []
-    # bet_buttonList2 = []
-    # for i in range(len(cards)):
-    #     if has_folded[i]: 
-    #         continue
-    #     elif money[i] == 0:
-    #         continue
-    #     else:
-    #         if currentBets[i] < currentPot:
-    #             entry = Entry(canvas)
-    #             entry.place(x = button_list[i * 2].winfo_x(), y = button_list[i*2].winfo_y() + 200)
-    #             bet_entryList2.append(entry)
-    #             button = tkinter.Button(canvas, text = "Submit a Call or Fold", command = lambda index = i: [trackMoney(bet_entryList2[index].get(), index), bet_entryList2[index].destroy(), bet_buttonList2[index].destroy()])
-    #             bet_buttonList2.append(button)
-    #             button.place(x = button_list[i*2].winfo_x(), y = button_list[i*2].winfo_y() + 275)
-
 
 
 #Need to fix the trackMoney Method, make new entries and buttons for raise and other stuff 
@@ -246,6 +225,7 @@ def startBetting():
 def trackMoney(action, index):
     global hasRaised, currentBets, currentPot
     ''' This method causes the amount of money to be given and collected'''
+    print(index)
     if action == "Fold":
         has_folded[index] = True
     else:
@@ -286,10 +266,21 @@ def check():
             return False
     return True
 
-
-
-#Need to show each money value with a lambda, 
 #as well as show ways to transfer money and have continous games
+
+def resetBoard():
+    global cards,board, image_listHand, image_listBoard, button_list, back_imageList
+    for child in canvas.winfo_children:
+        child.destroy()
+    deck = list(poker.Card)
+    random.shuffle(deck)
+    cards.clear()
+    board.clear()
+    image_listHand.clear()
+    image_listBoard.clear()
+    button_list.clear()
+    back_imageList.clear()
+  
 
    
 
@@ -329,6 +320,9 @@ currentMoneyLabel.place(x = 250, y = 10)
 
 awardWinnerButton = tkinter.Button(root, text = "Pay out for the Round", command = lambda: [awardWinner()])
 awardWinnerButton.place(x = 400, y = 10)
+
+resetBoardButton = tkinter.Button(root, text = "Go to next Round", command = lambda: [resetBoard()])
+resetBoardButton.place(x = 850, y = 10)
 
 
 canvas = tkinter.Canvas(root, width= 1500, height= 1500)
