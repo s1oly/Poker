@@ -198,10 +198,16 @@ def startBetting():
         # currentBets.append(0)
     for i in range(len(cards)):
         if has_folded[i]:
-            continue
+            entry = Entry(canvas)
+            bet_entryList.append(entry)
+            button = tkinter.Button(canvas)
+            bet_buttonList.append(button)
         elif money[i] == 0:
             message = messagebox.showwarning("showwarning", "You do not have any money to bet")
-            continue
+            entry = Entry(canvas)
+            bet_entryList.append(entry)
+            button = tkinter.Button(canvas)
+            bet_buttonList.append(button)
         else:
             if not hasRaised[i]:
                 entry = Entry(canvas)
@@ -225,7 +231,6 @@ def startBetting():
 def trackMoney(action, index):
     global hasRaised, currentBets, currentPot
     ''' This method causes the amount of money to be given and collected'''
-    print(index)
     if action == "Fold":
         has_folded[index] = True
     else:
