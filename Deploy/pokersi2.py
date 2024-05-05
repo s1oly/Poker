@@ -11,7 +11,8 @@ import random
 import numpy as np
 
 
-#Quick fix to the issue of the fold first fucks up the game is to make entries and button for fold and zero money but not show them
+#Need to fix the award money to only award for players that have not folded if not. It overcounts the bet if done as such
+#can change it to add current pot logic as well alongside current bet to see the raise and stuff.
 
 deck = list(poker.Card)
 random.shuffle(deck)
@@ -274,8 +275,8 @@ def check():
 #as well as show ways to transfer money and have continous games
 
 def resetBoard():
-    global cards,board, image_listHand, image_listBoard, button_list, back_imageList
-    for child in canvas.winfo_children:
+    global cards,board, image_listHand, image_listBoard, button_list, back_imageList, has_folded, currentBets, currentPot, boardButtonPressCount, boardCount
+    for child in canvas.winfo_children():
         child.destroy()
     deck = list(poker.Card)
     random.shuffle(deck)
@@ -285,6 +286,11 @@ def resetBoard():
     image_listBoard.clear()
     button_list.clear()
     back_imageList.clear()
+    has_folded.clear()
+    currentBets.clear()
+    currentPot = 0
+    boardButtonPressCount = 0
+    boardCount = 0
   
 
    
