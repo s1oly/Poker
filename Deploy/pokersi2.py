@@ -158,9 +158,9 @@ def evaluateHand():
                 evalCard.append(card2)
             scores.append(eval.evaluate(evalCard, evalBoard))
     for i in range(len(scores)):
-        if not has_folded[i] and scores[i] < minScore:
-            minScore = scores[i]
-    message = messagebox.showinfo("showinfo", "Player number " + str(scores.index(minScore)+ 1) + " was the winner with a " + eval.class_to_string(eval.get_rank_class(np.min(scores))))
+        if len(has_folded) > 0 and has_folded[i]:
+            scores.remove(scores.__getitem__(i))
+    message = messagebox.showinfo("showinfo", "Player number " + str(scores.index(np.min(scores)) + 1) + " was the winner with a " + eval.class_to_string(eval.get_rank_class(np.min(scores))))
 
 def getAmountOfPlayers():
     '''Gets the global amount of players'''
@@ -252,9 +252,12 @@ def trackMoney(action, index):
     
 #need to make a button that gives the winner the current bet amount of money afterwards
 def awardWinner():
-    global currentPot, scores, money, minScore, amountOfPlayers
+    global currentPot, scores, money, minScore, amountOfPlayers, currentBets, has_folded
     index = scores.index(minScore)
-    money[index] = money[index] + currentPot * amountOfPlayers
+    sum  = 0
+    for i in range(len(currentBets)):
+            sum = sum +  currentBets[i]
+    money[index] = money[index] + sum
     for index in range(len(image_listHand)):
         button_list[index].config(text = getPlayerMoney(index//2))
 
