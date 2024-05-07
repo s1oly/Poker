@@ -11,8 +11,8 @@ import random
 import numpy as np
 
 
-#Need to fix the award money to only award for players that have not folded if not. It overcounts the bet if done as such
-#can change it to add current pot logic as well alongside current bet to see the raise and stuff.
+#TODO: Need to add the final logic for people to call when someone else raised, 
+#use recursion when they haven't all raised yet or when not wanting 
 
 deck = list(poker.Card)
 random.shuffle(deck)
@@ -140,11 +140,10 @@ def setBoard():
 #Make sure that it only goes through cards that are not folded
 def evaluateHand():
     '''Method that evaluates the hand and returns the winner.'''
-    global evalCard, evalBoard, scores, minScore
+    global evalCard, evalBoard, scores
     eval = Evaluator()
     evalBoard = []
     scores = []
-    minScore = 10000000
     if len(board) == 5 and len(cards)%amountOfPlayers == 0: 
         for card in board:
             a = str(card.rank) + convert_to_Letter(str(card.suit))
@@ -159,7 +158,7 @@ def evaluateHand():
             scores.append(eval.evaluate(evalCard, evalBoard))
     for i in range(len(scores)):
         if len(has_folded) > 0 and has_folded[i]:
-            scores.remove(scores.__getitem__(i))
+            scores[i] = 100000000
     message = messagebox.showinfo("showinfo", "Player number " + str(scores.index(np.min(scores)) + 1) + " was the winner with a " + eval.class_to_string(eval.get_rank_class(np.min(scores))))
 
 def getAmountOfPlayers():
@@ -243,6 +242,9 @@ def trackMoney(action, index):
         elif int(action) + currentBets[index] == currentPot: # Call
             money[index] = money[index] - (int(action))
             currentBets[index] = currentPot
+        else:
+            money[index] = money[index] - int((action))
+            currentBets[index] = currentBets[index] +int((action))
             
     for index in range(len(image_listHand)):
         button_list[index].config(text = getPlayerMoney(index//2))
