@@ -254,8 +254,8 @@ def trackMoney(action, index):
     
 #need to make a button that gives the winner the current bet amount of money afterwards
 def awardWinner():
-    global currentPot, scores, money, minScore, amountOfPlayers, currentBets, has_folded
-    index = scores.index(minScore)
+    global currentPot, scores, money, amountOfPlayers, currentBets, has_folded
+    index = scores.index(np.min(scores))
     sum  = 0
     for i in range(len(currentBets)):
             sum = sum +  currentBets[i]
@@ -296,6 +296,8 @@ def resetBoard():
     currentPot = 0
     boardButtonPressCount = 0
     boardCount = 0
+    for i in range(amountOfPlayers):
+        currentBets.append(0)
   
 
    
